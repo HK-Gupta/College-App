@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "1040966325229",
+    "project_id": "college-app-38eb6",
+    "storage_bucket": "college-app-38eb6.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1040966325229:android:b7be6d4aac37035bdd8de4",
+        "android_client_info": {
+          "package_name": "com.example.collegeapp"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC59ELS7VfOmzusOpWCwtkw-LxS1teoIaI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
