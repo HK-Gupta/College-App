@@ -33,6 +33,7 @@ fun AdminDashboard(navController: NavController) {
 
     val list = listOf(
         DashboardItemModel("Manage Banner", Routes.ManageBanner.route),
+        DashboardItemModel("Manage Notice", Routes.ManageNotice.route),
         DashboardItemModel("Manage Faculty", Routes.ManageFaculty.route),
         DashboardItemModel("Manage Gallery", Routes.ManageGallery.route),
         DashboardItemModel("Manage College Info", Routes.ManageCollegeInfo.route)

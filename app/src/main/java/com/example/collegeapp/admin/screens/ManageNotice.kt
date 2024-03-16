@@ -5,6 +5,7 @@ import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -15,7 +16,6 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Add
 import androidx.compose.material.icons.rounded.ArrowBack
-import androidx.compose.material.icons.rounded.Menu
 import androidx.compose.material3.Button
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -23,6 +23,7 @@ import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
@@ -39,7 +40,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.semantics.Role.Companion.Button
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -48,45 +48,57 @@ import androidx.navigation.compose.rememberNavController
 import coil.compose.rememberAsyncImagePainter
 import com.example.collegeapp.R
 import com.example.collegeapp.itemview.BannerItemView
+import com.example.collegeapp.itemview.NoticeItemView
 import com.example.collegeapp.models.BannerModel
+import com.example.collegeapp.models.NoticeModel
 import com.example.collegeapp.ui.theme.Purple40
-import com.example.collegeapp.utils.Constants.BANNER
-import com.example.collegeapp.viewmodel.BannerViewModel
-import kotlinx.coroutines.launch
+import com.example.collegeapp.utils.Constants
+import com.example.collegeapp.viewmodel.NoticeViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ManageBanner(navController: NavController) {
-
+fun ManageNotice(navController: NavController) {
     val context = LocalContext.current
 
-    val bannerViewModel: BannerViewModel = viewModel ()
+    val noticeViewModel: NoticeViewModel = viewModel ()
 
-    val isUploaded by bannerViewModel.isPosted.observeAsState(false)
-    val isDeleted by bannerViewModel.isDeleted.observeAsState(false)
-    val bannerList by bannerViewModel.bannerList.observeAsState(null)
+    val isUploaded by noticeViewModel.isPosted.observeAsState(false)
+    val isDeleted by noticeViewModel.isDeleted.observeAsState(false)
+    val noticeList by noticeViewModel.noticeList.observeAsState(null)
 
-    bannerViewModel.getBanner()
+    noticeViewModel.getNotice()
 
     var imageUri by remember {
         mutableStateOf<Uri?>(null)
     }
+    var isNotice by remember {
+        mutableStateOf(false)
+    }
+
+    var title by remember {
+        mutableStateOf("")
+    }
+
+    var link by remember {
+        mutableStateOf("")
+    }
 
     val launcher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.GetContent()) {it->
+        contract = ActivityResultContracts.GetContent()) { it->
         imageUri = it
     }
 
     // To know whether the image is Uploaded or not.
     LaunchedEffect(isUploaded) {
         if(isUploaded) {
-            Toast.makeText(context, "Image Uploaded", Toast.LENGTH_SHORT).show()
+            Toast.makeText(context, "Notice Uploaded", Toast.LENGTH_SHORT).show()
             imageUri = null
+            isNotice = false
         }
     }
     LaunchedEffect(isDeleted) {
         if(isDeleted) {
-            Toast.makeText(context, "Image Deleted", Toast.LENGTH_SHORT).show()
+            Toast.makeText(context, "Notice Deleted", Toast.LENGTH_SHORT).show()
         }
     }
 
@@ -95,7 +107,7 @@ fun ManageBanner(navController: NavController) {
         topBar = {
             TopAppBar(title = {
                 Text(
-                    text = "Manage Banner",
+                    text = "Manage Notice",
                     color = Color.White
                 )
             },
@@ -115,7 +127,7 @@ fun ManageBanner(navController: NavController) {
 
         floatingActionButton = {
             FloatingActionButton(onClick = {
-                launcher.launch("image/*")
+                isNotice = true
             }) {
                 Icon(
                     imageVector = Icons.Rounded.Add,
@@ -126,33 +138,73 @@ fun ManageBanner(navController: NavController) {
     ){padding->
         Column(modifier = Modifier.padding(padding)){
 
-            if (imageUri != null) {
+            if (isNotice) {
                 ElevatedCard(
                     modifier = Modifier.padding(7.dp)
                 ) {
-                    Image(
-                    painter = rememberAsyncImagePainter(model = imageUri),
-                        contentDescription = BANNER,
+
+                    OutlinedTextField(
+                        value = title,
+                        onValueChange = {
+                             title = it
+                        },
+                        placeholder = {
+                            Text(text = "Notice title...")
+                        },
                         modifier = Modifier
                             .fillMaxWidth()
-                            .height(240.dp),
+                            .padding(4.dp)
+                    )
+
+                    OutlinedTextField(
+                        value = link,
+                        onValueChange = {
+                            link = it
+                        },
+                        placeholder = {
+                            Text(text = "Notice link...")
+                        },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(4.dp)
+                    )
+
+                    Image(
+                        painter = if(imageUri==null)    painterResource(id = R.drawable.placeholder)
+                                else    rememberAsyncImagePainter(model = imageUri),
+                        contentDescription = Constants.NOTICE,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(240.dp)
+                            .clickable {
+                                launcher.launch("image/*")
+                            },
                         contentScale = ContentScale.Crop
                     )
 
                     Row {
                         Button(
                             onClick = {
-                                bannerViewModel.saveImage(imageUri!!)
+
+                                if(imageUri==null )
+                                    Toast.makeText(context, "Please Provide Image", Toast.LENGTH_SHORT).show()
+                                else if(title=="" )
+                                    Toast.makeText(context, "Please Provide Title", Toast.LENGTH_SHORT).show()
+                                else
+                                    noticeViewModel.saveNotice(imageUri!!, title, link)
                             },
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .weight(1f)
                                 .padding(horizontal = 10.dp, vertical = 4.dp)
                         ) {
-                            Text(text = "Add Image")
+                            Text(text = "Add Notice")
                         }
                         OutlinedButton(
-                            onClick = { imageUri = null },
+                            onClick = {
+                                imageUri = null
+                                isNotice=false },
+
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .weight(1f)
@@ -164,11 +216,11 @@ fun ManageBanner(navController: NavController) {
                 }
             }
             LazyColumn {
-                items(bannerList ?: emptyList()) { it: BannerModel ->
-                    BannerItemView(
-                        bannerModel = it,
+                items(noticeList ?: emptyList()) { it: NoticeModel ->
+                    NoticeItemView(
+                        noticeModel = it,
                         delete = {docId->
-                            bannerViewModel.deleteBanner(docId)
+                            noticeViewModel.deleteNotice(docId)
                         })
                 }
             }
@@ -176,9 +228,8 @@ fun ManageBanner(navController: NavController) {
     }
 }
 
-
-@Preview
+@Preview(showSystemUi = true)
 @Composable
-fun ManageBannerView() {
-    ManageBanner(rememberNavController())
+private fun ManageNoticePreview() {
+    ManageNotice(rememberNavController())
 }

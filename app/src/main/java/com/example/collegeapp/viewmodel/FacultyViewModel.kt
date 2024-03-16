@@ -6,16 +6,20 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.example.collegeapp.models.BannerModel
+import com.example.collegeapp.models.FacultyModel
+import com.example.collegeapp.models.NoticeModel
 import com.example.collegeapp.utils.Constants.BANNER
+import com.example.collegeapp.utils.Constants.FACULTY
+import com.example.collegeapp.utils.Constants.NOTICE
 import com.google.firebase.Firebase
 import com.google.firebase.firestore.firestore
 import com.google.firebase.firestore.toObject
 import com.google.firebase.storage.storage
 import java.util.UUID
 
-class BannerViewModel: ViewModel() {
+class FacultyViewModel: ViewModel() {
 
-    private val bannerRef = Firebase.firestore.collection(BANNER)
+    private val facultyRef = Firebase.firestore.collection(FACULTY)
     private val storageRef = Firebase.storage.reference
 
     private val isPostedMutable = MutableLiveData<Boolean>()
@@ -24,34 +28,39 @@ class BannerViewModel: ViewModel() {
     private val isDeletedMutable = MutableLiveData<Boolean>()
     val isDeleted: LiveData<Boolean> = isDeletedMutable
 
-    private val bannerListMutable = MutableLiveData<List<BannerModel>>()
-    val bannerList: LiveData<List<BannerModel>> = bannerListMutable
+    private val categoryListMutable = MutableLiveData<List<String>>()
+    val categoryList: LiveData<List<String>> = categoryListMutable
+
+    private val facultyListMutable = MutableLiveData<List<FacultyModel>>()
+    val facultyList: LiveData<List<FacultyModel>> = facultyListMutable
 
 
-
-
-    fun saveImage(uri: Uri) {
+    fun saveFaculty(uri: Uri, name: String, email: String, position: String) {
         isPostedMutable.postValue(false)
 
         val randomUid = UUID.randomUUID().toString()
-        val imageRef = storageRef.child("$BANNER/${randomUid}.jpg")
+        val imageRef = storageRef.child("$FACULTY/${randomUid}.jpg")
 
         val uploadTask = imageRef.putFile(uri)
 
         uploadTask.addOnSuccessListener {task->
             imageRef.downloadUrl.addOnSuccessListener { it->
-                uploadImage(it.toString(), randomUid)
+                uploadFaculty(it.toString(), randomUid, name, email, position)
             }
         }
 
     }
 
-    private fun uploadImage(imageUrl: String, docId: String) {
+    private fun uploadFaculty(imageUrl: String, docId: String, name: String,
+                              email: String, position: String) {
         val map = mutableMapOf<String, String>()
-        map["url"] = imageUrl
+        map["imageUrl"] = imageUrl
         map["docId"] = docId
+        map["name"] = name
+        map["email"] = email
+        map["position"] = position
 
-        bannerRef.document(docId).set(map)
+        facultyRef.document(docId).set(map)
             .addOnSuccessListener {
                 isPostedMutable.postValue(true)
             }.addOnFailureListener {
@@ -59,28 +68,27 @@ class BannerViewModel: ViewModel() {
             }
     }
 
-    fun getBanner() {
-        bannerRef.get().addOnSuccessListener {snapshot->
-            val list = mutableListOf<BannerModel>()
+    fun getFaculty() {
+        facultyRef.get().addOnSuccessListener {snapshot->
+            val list = mutableListOf<FacultyModel>()
 
             for(doc in snapshot) {
-                list.add(doc.toObject(BannerModel::class.java))
+                list.add(doc.toObject(FacultyModel::class.java))
             }
 
-            bannerListMutable.postValue(list)
+            facultyListMutable.postValue(list)
         }
     }
 
-    fun deleteBanner(bannerModel: BannerModel) {
+    fun deleteFaculty (facultyModel: FacultyModel) {
 
-        bannerRef.document(bannerModel.docId!!).delete()
+        facultyRef.document(facultyModel.docId!!).delete()
             .addOnSuccessListener {
-                Firebase.storage.getReferenceFromUrl(bannerModel.url!!).delete()
+                Firebase.storage.getReferenceFromUrl(facultyModel.imageUrl!!).delete()
                 isDeletedMutable.postValue(true)
             }.addOnFailureListener {exception->
                 isDeletedMutable.postValue(false)
                 Log.d("DeleteError", "Error deleting banner: ${exception.message}", exception)
-
             }
     }
 

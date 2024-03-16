@@ -26,7 +26,7 @@ import com.example.collegeapp.models.BannerModel
 @Composable
 fun BannerItemView(
     bannerModel: BannerModel,
-    delete:(BannerModel)->Unit
+    delete: (docId: BannerModel)->Unit
 ) {
     OutlinedCard (
         modifier = Modifier.padding(4.dp)
@@ -48,7 +48,6 @@ fun BannerItemView(
                     .constrainAs(delete) {
                     top.linkTo(parent.top)
                     end.linkTo(parent.end)
-
                 }.padding(7.dp)
                     .clickable {
                         delete(bannerModel)

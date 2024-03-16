@@ -6,16 +6,18 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.example.collegeapp.models.BannerModel
+import com.example.collegeapp.models.NoticeModel
 import com.example.collegeapp.utils.Constants.BANNER
+import com.example.collegeapp.utils.Constants.NOTICE
 import com.google.firebase.Firebase
 import com.google.firebase.firestore.firestore
 import com.google.firebase.firestore.toObject
 import com.google.firebase.storage.storage
 import java.util.UUID
 
-class BannerViewModel: ViewModel() {
+class NoticeViewModel: ViewModel() {
 
-    private val bannerRef = Firebase.firestore.collection(BANNER)
+    private val noticeRef = Firebase.firestore.collection(NOTICE)
     private val storageRef = Firebase.storage.reference
 
     private val isPostedMutable = MutableLiveData<Boolean>()
@@ -24,34 +26,36 @@ class BannerViewModel: ViewModel() {
     private val isDeletedMutable = MutableLiveData<Boolean>()
     val isDeleted: LiveData<Boolean> = isDeletedMutable
 
-    private val bannerListMutable = MutableLiveData<List<BannerModel>>()
-    val bannerList: LiveData<List<BannerModel>> = bannerListMutable
+    private val noticeListMutable = MutableLiveData<List<NoticeModel>>()
+    val noticeList: LiveData<List<NoticeModel>> = noticeListMutable
 
 
 
 
-    fun saveImage(uri: Uri) {
+    fun saveNotice(uri: Uri, title: String, link: String) {
         isPostedMutable.postValue(false)
 
         val randomUid = UUID.randomUUID().toString()
-        val imageRef = storageRef.child("$BANNER/${randomUid}.jpg")
+        val imageRef = storageRef.child("$NOTICE/${randomUid}.jpg")
 
         val uploadTask = imageRef.putFile(uri)
 
         uploadTask.addOnSuccessListener {task->
             imageRef.downloadUrl.addOnSuccessListener { it->
-                uploadImage(it.toString(), randomUid)
+                uploadNotice(it.toString(), randomUid, title, link)
             }
         }
 
     }
 
-    private fun uploadImage(imageUrl: String, docId: String) {
+    private fun uploadNotice(imageUrl: String, docId: String, title: String, link: String) {
         val map = mutableMapOf<String, String>()
-        map["url"] = imageUrl
+        map["imageUrl"] = imageUrl
         map["docId"] = docId
+        map["title"] = title
+        map["link"] = link
 
-        bannerRef.document(docId).set(map)
+        noticeRef.document(docId).set(map)
             .addOnSuccessListener {
                 isPostedMutable.postValue(true)
             }.addOnFailureListener {
@@ -59,28 +63,27 @@ class BannerViewModel: ViewModel() {
             }
     }
 
-    fun getBanner() {
-        bannerRef.get().addOnSuccessListener {snapshot->
-            val list = mutableListOf<BannerModel>()
+    fun getNotice() {
+        noticeRef.get().addOnSuccessListener {snapshot->
+            val list = mutableListOf<NoticeModel>()
 
             for(doc in snapshot) {
-                list.add(doc.toObject(BannerModel::class.java))
+                list.add(doc.toObject(NoticeModel::class.java))
             }
 
-            bannerListMutable.postValue(list)
+            noticeListMutable.postValue(list)
         }
     }
 
-    fun deleteBanner(bannerModel: BannerModel) {
+    fun deleteNotice (noticeModel: NoticeModel) {
 
-        bannerRef.document(bannerModel.docId!!).delete()
+        noticeRef.document(noticeModel.docId!!).delete()
             .addOnSuccessListener {
-                Firebase.storage.getReferenceFromUrl(bannerModel.url!!).delete()
+                Firebase.storage.getReferenceFromUrl(noticeModel.imageUrl!!).delete()
                 isDeletedMutable.postValue(true)
             }.addOnFailureListener {exception->
                 isDeletedMutable.postValue(false)
                 Log.d("DeleteError", "Error deleting banner: ${exception.message}", exception)
-
             }
     }
 

@@ -12,6 +12,7 @@ import com.example.collegeapp.admin.screens.ManageBanner
 import com.example.collegeapp.admin.screens.ManageCollegeInfo
 import com.example.collegeapp.admin.screens.ManageFaculty
 import com.example.collegeapp.admin.screens.ManageGallery
+import com.example.collegeapp.admin.screens.ManageNotice
 import com.example.collegeapp.screens.AboutUs
 import com.example.collegeapp.screens.BottomNav
 import com.example.collegeapp.screens.Faculty
@@ -63,6 +64,9 @@ fun NavGraph(navController: NavHostController) {
         }
         composable(Routes.ManageGallery.route) {
             ManageGallery()
+        }
+        composable(Routes.ManageNotice.route) {
+            ManageNotice(navController)
         }
     }
 }
