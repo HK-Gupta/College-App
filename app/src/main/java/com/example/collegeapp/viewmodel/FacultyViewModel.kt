@@ -9,8 +9,10 @@ import com.example.collegeapp.models.BannerModel
 import com.example.collegeapp.models.FacultyModel
 import com.example.collegeapp.models.NoticeModel
 import com.example.collegeapp.utils.Constants.BANNER
+import com.example.collegeapp.utils.Constants.CATEGORY
 import com.example.collegeapp.utils.Constants.FACULTY
 import com.example.collegeapp.utils.Constants.NOTICE
+import com.example.collegeapp.utils.Constants.TEACHER
 import com.google.firebase.Firebase
 import com.google.firebase.firestore.firestore
 import com.google.firebase.firestore.toObject
@@ -35,7 +37,7 @@ class FacultyViewModel: ViewModel() {
     val facultyList: LiveData<List<FacultyModel>> = facultyListMutable
 
 
-    fun saveFaculty(uri: Uri, name: String, email: String, position: String) {
+    fun saveFaculty(uri: Uri, name: String, email: String, position: String, category: String) {
         isPostedMutable.postValue(false)
 
         val randomUid = UUID.randomUUID().toString()
@@ -45,22 +47,23 @@ class FacultyViewModel: ViewModel() {
 
         uploadTask.addOnSuccessListener {task->
             imageRef.downloadUrl.addOnSuccessListener { it->
-                uploadFaculty(it.toString(), randomUid, name, email, position)
+                uploadFaculty(it.toString(), randomUid, name, email, position, category)
             }
         }
 
     }
 
     private fun uploadFaculty(imageUrl: String, docId: String, name: String,
-                              email: String, position: String) {
+                              email: String, position: String, category: String) {
         val map = mutableMapOf<String, String>()
         map["imageUrl"] = imageUrl
         map["docId"] = docId
         map["name"] = name
         map["email"] = email
         map["position"] = position
+        map[CATEGORY] = category
 
-        facultyRef.document(docId).set(map)
+        facultyRef.document(category).collection(TEACHER).document(docId).set(map)
             .addOnSuccessListener {
                 isPostedMutable.postValue(true)
             }.addOnFailureListener {
@@ -68,8 +71,10 @@ class FacultyViewModel: ViewModel() {
             }
     }
 
-    fun getFaculty() {
-        facultyRef.get().addOnSuccessListener {snapshot->
+    // May be there will be a change in path...
+    fun getFaculty(catName: String) {
+        facultyRef.document(catName).collection(TEACHER)
+            .get().addOnSuccessListener { snapshot->
             val list = mutableListOf<FacultyModel>()
 
             for(doc in snapshot) {
@@ -82,15 +87,49 @@ class FacultyViewModel: ViewModel() {
 
     fun deleteFaculty (facultyModel: FacultyModel) {
 
-        facultyRef.document(facultyModel.docId!!).delete()
-            .addOnSuccessListener {
+        facultyRef.document(facultyModel.category_name!!).collection(TEACHER)
+            .document(facultyModel.docId!!).delete().addOnSuccessListener {
                 Firebase.storage.getReferenceFromUrl(facultyModel.imageUrl!!).delete()
                 isDeletedMutable.postValue(true)
             }.addOnFailureListener {exception->
                 isDeletedMutable.postValue(false)
-                Log.d("DeleteError", "Error deleting banner: ${exception.message}", exception)
+                Log.d("DeleteError", "Error deleting Faculty: ${exception.message}", exception)
             }
     }
 
+
+    // Category
+    fun uploadCategory (category: String) {
+        val map = mutableMapOf<String, String>()
+        map[CATEGORY] = category
+
+        facultyRef.document(category).set(map)
+            .addOnSuccessListener {
+                isPostedMutable.postValue(true)
+            }.addOnFailureListener {
+                isPostedMutable.postValue(false)
+            }
+    }
+    fun getCategory() {
+        facultyRef.get().addOnSuccessListener {snapshot->
+            val list = mutableListOf<String>()
+
+            for(doc in snapshot) {
+                list.add(doc.get(CATEGORY).toString())
+            }
+
+            categoryListMutable.postValue(list)
+        }
+    }
+    fun deleteCategory (category: String) {
+
+        facultyRef.document(category).delete()
+            .addOnSuccessListener {
+                isDeletedMutable.postValue(true)
+            }.addOnFailureListener {exception->
+                isDeletedMutable.postValue(false)
+                Log.d("DeleteError", "Error deleting Category: ${exception.message}", exception)
+            }
+    }
 
 }

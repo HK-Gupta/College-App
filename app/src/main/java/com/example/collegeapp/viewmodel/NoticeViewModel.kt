@@ -83,7 +83,7 @@ class NoticeViewModel: ViewModel() {
                 isDeletedMutable.postValue(true)
             }.addOnFailureListener {exception->
                 isDeletedMutable.postValue(false)
-                Log.d("DeleteError", "Error deleting banner: ${exception.message}", exception)
+                Log.d("DeleteError", "Error deleting notice: ${exception.message}", exception)
             }
     }
 

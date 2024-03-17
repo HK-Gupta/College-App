@@ -8,6 +8,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.collegeapp.admin.screens.AdminDashboard
+import com.example.collegeapp.admin.screens.FacultyDetailsScreen
 import com.example.collegeapp.admin.screens.ManageBanner
 import com.example.collegeapp.admin.screens.ManageCollegeInfo
 import com.example.collegeapp.admin.screens.ManageFaculty
@@ -18,6 +19,7 @@ import com.example.collegeapp.screens.BottomNav
 import com.example.collegeapp.screens.Faculty
 import com.example.collegeapp.screens.Gallery
 import com.example.collegeapp.screens.Home
+import com.example.collegeapp.utils.Constants.CATEGORY
 import com.example.collegeapp.utils.Constants.IS_ADMIN
 
 
@@ -60,13 +62,18 @@ fun NavGraph(navController: NavHostController) {
             ManageCollegeInfo()
         }
         composable(Routes.ManageFaculty.route) {
-            ManageFaculty()
+            ManageFaculty(navController)
         }
         composable(Routes.ManageGallery.route) {
             ManageGallery()
         }
         composable(Routes.ManageNotice.route) {
             ManageNotice(navController)
+        }
+        composable(Routes.FacultyDetailsScreen.route) {it->
+            val data = it.arguments!!.getString(CATEGORY)
+
+            FacultyDetailsScreen(navController, data!!)
         }
     }
 }

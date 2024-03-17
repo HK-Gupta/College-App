@@ -8,6 +8,8 @@ object Constants {
     const val COLLEGE_INFO = "college_info"
     const val FACULTY = "faculty"
     const val NOTES = "notes"
+    const val CATEGORY = "category_name"
+    const val TEACHER = "Teacher"
 
     const val IS_ADMIN = true
 }
