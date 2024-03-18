@@ -71,7 +71,6 @@ class FacultyViewModel: ViewModel() {
             }
     }
 
-    // May be there will be a change in path...
     fun getFaculty(catName: String) {
         facultyRef.document(catName).collection(TEACHER)
             .get().addOnSuccessListener { snapshot->
