@@ -59,7 +59,7 @@ fun NavGraph(navController: NavHostController) {
             ManageBanner(navController)
         }
         composable(Routes.ManageCollegeInfo.route) {
-            ManageCollegeInfo()
+            ManageCollegeInfo(navController)
         }
         composable(Routes.ManageFaculty.route) {
             ManageFaculty(navController)
