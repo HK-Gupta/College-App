@@ -39,6 +39,7 @@ import com.example.collegeapp.ui.theme.SMALL_TEXT
 import com.example.collegeapp.ui.theme.SkyBlue
 import com.example.collegeapp.ui.theme.TITLE_SIZE
 import com.example.collegeapp.utils.Constants
+import com.example.collegeapp.utils.Constants.IS_ADMIN
 
 @Composable
 fun TeacherItemView(
@@ -89,23 +90,25 @@ fun TeacherItemView(
 
             }
 
-            Card (
-                modifier = Modifier
-                    .constrainAs(delete) {
-                        top.linkTo(parent.top)
-                        end.linkTo(parent.end)
-                    }
-                    .padding(7.dp)
-                    .clickable {
-                        delete(facultyModel)
-                    }
-            ){
-                Image(
-                    imageVector = Icons.Rounded.Delete,
-                    contentDescription = null,
-                    modifier = Modifier.padding(7.dp),
-                    colorFilter = ColorFilter.tint(Color.Red)
-                )
+            if (IS_ADMIN) {
+                Card(
+                    modifier = Modifier
+                        .constrainAs(delete) {
+                            top.linkTo(parent.top)
+                            end.linkTo(parent.end)
+                        }
+                        .padding(7.dp)
+                        .clickable {
+                            delete(facultyModel)
+                        }
+                ) {
+                    Image(
+                        imageVector = Icons.Rounded.Delete,
+                        contentDescription = null,
+                        modifier = Modifier.padding(7.dp),
+                        colorFilter = ColorFilter.tint(Color.Red)
+                    )
+                }
             }
         }
     }

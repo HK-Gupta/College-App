@@ -2,6 +2,7 @@ package com.example.collegeapp.navigation
 
 sealed class Routes(val route: String) {
 
+
     object AboutUs: Routes("about_us")
     object BottomNav: Routes("bottom_nav")
     object Faculty: Routes("faculty")

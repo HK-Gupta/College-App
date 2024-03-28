@@ -152,7 +152,7 @@ fun BottomNav(navHostController: NavHostController) {
                         com.example.collegeapp.screens.AboutUs()
                     }
                     composable(Routes.Faculty.route) {
-                        com.example.collegeapp.screens.Faculty()
+                        com.example.collegeapp.screens.Faculty(navHostController)
                     }
                     composable(Routes.Gallery.route) {
                         com.example.collegeapp.screens.Gallery()

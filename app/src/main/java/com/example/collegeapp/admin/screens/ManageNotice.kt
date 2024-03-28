@@ -22,6 +22,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
@@ -108,10 +109,12 @@ fun ManageNotice(navController: NavController) {
             TopAppBar(title = {
                 Text(
                     text = "Manage Notice",
-                    color = Color.White
+                    color = MaterialTheme.colorScheme.onSecondaryContainer
                 )
             },
-                colors = TopAppBarDefaults.largeTopAppBarColors(containerColor = Purple40),
+                colors = TopAppBarDefaults.largeTopAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.secondaryContainer
+                ),
 
                 navigationIcon = {
                     IconButton(onClick = {

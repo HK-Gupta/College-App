@@ -37,6 +37,7 @@ import com.example.collegeapp.ui.theme.SMALL_TEXT
 import com.example.collegeapp.ui.theme.SkyBlue
 import com.example.collegeapp.ui.theme.TEXT_SIZE
 import com.example.collegeapp.ui.theme.TITLE_SIZE
+import com.example.collegeapp.utils.Constants.IS_ADMIN
 
 @Composable
 fun GalleryItemView(
@@ -53,12 +54,12 @@ fun GalleryItemView(
             Text(
                 text = galleryModel.category!!,
                 modifier = Modifier
-                    .padding(horizontal = 12.dp, vertical = 7.dp)
+                    .padding(horizontal = 12.dp, vertical = 8.dp)
                     .constrainAs(
                         category
                     ) {
                         start.linkTo(parent.start)
-                        end.linkTo(delete.start)
+                        end.linkTo(parent.end)
                         top.linkTo(parent.top)
                         bottom.linkTo(parent.bottom)
 
@@ -67,23 +68,25 @@ fun GalleryItemView(
                 fontSize = TEXT_SIZE
             )
 
-            Card (
-                modifier = Modifier
-                    .constrainAs(delete) {
-                        top.linkTo(parent.top)
-                        end.linkTo(parent.end)
-                    }
-                    .padding(7.dp)
-                    .clickable {
-                        delete(galleryModel)
-                    }
-            ){
-                Image(
-                    imageVector = Icons.Rounded.Delete,
-                    contentDescription = null,
-                    modifier = Modifier.padding(7.dp),
-                    colorFilter = ColorFilter.tint(Color.Red)
-                )
+            if (IS_ADMIN) {
+                Card(
+                    modifier = Modifier
+                        .constrainAs(delete) {
+                            top.linkTo(parent.top)
+                            end.linkTo(parent.end)
+                        }
+                        .padding(7.dp)
+                        .clickable {
+                            delete(galleryModel)
+                        }
+                ) {
+                    Image(
+                        imageVector = Icons.Rounded.Delete,
+                        contentDescription = null,
+                        modifier = Modifier.padding(7.dp),
+                        colorFilter = ColorFilter.tint(Color.Red)
+                    )
+                }
             }
         }
 

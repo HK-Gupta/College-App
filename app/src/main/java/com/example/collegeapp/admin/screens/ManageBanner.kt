@@ -22,6 +22,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -52,6 +53,7 @@ import com.example.collegeapp.models.BannerModel
 import com.example.collegeapp.ui.theme.Purple40
 import com.example.collegeapp.utils.Constants.BANNER
 import com.example.collegeapp.viewmodel.BannerViewModel
+import com.example.collegeapp.widget.LoadingDialog
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -68,6 +70,18 @@ fun ManageBanner(navController: NavController) {
 
     bannerViewModel.getBanner()
 
+    val showLoader = remember {
+        mutableStateOf(false)
+    }
+
+    if(showLoader.value) {
+        LoadingDialog (
+            onDismissRequest = {
+                showLoader.value = false
+            }
+        )
+    }
+
     var imageUri by remember {
         mutableStateOf<Uri?>(null)
     }
@@ -80,6 +94,7 @@ fun ManageBanner(navController: NavController) {
     // To know whether the image is Uploaded or not.
     LaunchedEffect(isUploaded) {
         if(isUploaded) {
+            showLoader.value = false
             Toast.makeText(context, "Image Uploaded", Toast.LENGTH_SHORT).show()
             imageUri = null
         }
@@ -96,10 +111,12 @@ fun ManageBanner(navController: NavController) {
             TopAppBar(title = {
                 Text(
                     text = "Manage Banner",
-                    color = Color.White
+                    color = MaterialTheme.colorScheme.onSecondaryContainer
                 )
             },
-                colors = TopAppBarDefaults.largeTopAppBarColors(containerColor = Purple40),
+                colors = TopAppBarDefaults.largeTopAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.secondaryContainer
+                ),
 
                 navigationIcon = {
                     IconButton(onClick = {
@@ -142,6 +159,7 @@ fun ManageBanner(navController: NavController) {
                     Row {
                         Button(
                             onClick = {
+                                showLoader.value = true
                                 bannerViewModel.saveImage(imageUri!!)
                             },
                             modifier = Modifier

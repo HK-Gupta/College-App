@@ -8,6 +8,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.collegeapp.admin.screens.AdminDashboard
+import com.example.collegeapp.admin.screens.AdminSignup
 import com.example.collegeapp.admin.screens.FacultyDetailsScreen
 import com.example.collegeapp.admin.screens.ManageBanner
 import com.example.collegeapp.admin.screens.ManageCollegeInfo
@@ -44,7 +45,7 @@ fun NavGraph(navController: NavHostController) {
             AboutUs()
         }
         composable(Routes.Faculty.route) {
-            Faculty()
+            Faculty(navController)
         }
         composable(Routes.Gallery.route) {
             Gallery()
